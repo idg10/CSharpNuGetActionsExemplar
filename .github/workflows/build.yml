@@ -13,10 +13,27 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.101
+
+    - name: Setup GitVersion
+      # There appear to be two options for installing. There's this:
+      # uses: actions/setup-gitversion@v1.0.0
+      # with:
+      #  gitversion-version: 5.2.4
+      # However that doesn't seem to have a corresponding task for running
+      # the tool, so we use this instead, because it aligns with the following
+      # step that runs the tool
+      uses: gittools/actions/gitversion/setup@v0.9
+      with:
+          versionSpec: '5.1.x'
+
+    - name: Use GitVersion
+      uses: gittools/actions/gitversion/execute@v0.9
+      id: gitversion # step id used as reference for output values
 
     - name: Install dependencies
       working-directory: src
@@ -24,15 +41,15 @@ jobs:
 
     - name: Build
       working-directory: src
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build --configuration Release --no-restore /p:Version=${{ steps.gitversion.outputs.semVer }}
 
     - name: Test
       working-directory: src
-      run: dotnet test --no-build --configuration Release
+      run: dotnet test --no-build --configuration Release /p:Version=${{ steps.gitversion.outputs.semVer }}
 
     - name: Create NuGet packages
       working-directory: src
-      run: dotnet pack --no-build --configuration Release --output packages
+      run: dotnet pack --no-build --configuration Release --output packages /p:Version=${{ steps.gitversion.outputs.semVer }}
 
     - name: Upload NuGet package artifact
       uses: actions/upload-artifact@v1.0.0

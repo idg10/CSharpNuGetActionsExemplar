@@ -14,6 +14,14 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    # Step required by GitVersion.
+    # The actions/checkout@v2 action minimizes the work it performs, which is normally good,
+    # but because it avoids fetching anything other than the commit we want to build, GitVersion
+    # doesn't have the information it requires to determine the correct version.
+    # TODO: is this overkill? Does this end up fetching more than GitVersion needs?
+    - name: Fetch all history for all tags and branches
+      run: git fetch --prune --unshallow
+
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:

@@ -28,4 +28,14 @@ jobs:
 
     - name: Test
       working-directory: src
-      run: dotnet test --no-restore --no-build --verbosity normal
+      run: dotnet test --no-build --configuration Release
+
+    - name: Create NuGet packages
+      working-directory: src
+      run: dotnet pack --no-build --configuration Release --output packages
+
+    - name: Upload NuGet package artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: NuGet packages
+        path: src/packages

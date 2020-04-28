@@ -1,8 +1,13 @@
-name: .NET Core
+# This will build any time we push to master, and also for PRs that target master.
+# It will also build
+
+name: Build and release
 
 on:
   push:
     branches: [ master ]
+  create:
+    tags: [ v* ]
   pull_request:
     branches: [ master ]
 
@@ -10,6 +15,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+
+    env:
+      CreateRelease: ${{ startsWith(github.ref, 'refs/tags/v') }}
 
     steps:
     - uses: actions/checkout@v2
@@ -64,3 +72,15 @@ jobs:
       with:
         name: NuGet packages
         path: src/packages
+
+    - name: Create GitHub Release
+      id: create_release
+      if: env.CreateRelease == 'true'
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: ${{ steps.gitversion.outputs.preReleaseTag != '' }}

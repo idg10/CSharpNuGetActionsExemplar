@@ -6,6 +6,7 @@ name: Build and release
 on:
   push:
     branches: [ master ]
+  create:
     tags: [ v* ]
   pull_request:
     branches: [ master ]
@@ -81,9 +82,5 @@ jobs:
       with:
         tag_name: ${{ github.ref }}
         release_name: Release ${{ github.ref }}
-        body: |
-          Changes in this Release
-          - First Change
-          - Second Change
         draft: false
         prerelease: steps.gitversion.outputs.preReleaseTag != ''

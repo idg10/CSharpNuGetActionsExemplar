@@ -76,7 +76,7 @@ jobs:
     - name: Create GitHub Release
       id: create_release
       if: env.CreateRelease == 'true'
-      uses: actions/create-release@latest
+      uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:

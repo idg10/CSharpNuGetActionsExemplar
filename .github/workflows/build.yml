@@ -84,3 +84,7 @@ jobs:
         release_name: Release ${{ github.ref }}
         draft: false
         prerelease: ${{ steps.gitversion.outputs.preReleaseTag != '' }}
+
+    - name: Publish NuGet Package
+      if: env.CreateRelease == 'true'
+      run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.nuget_api_key }} --source https://api.nuget.org/v3/index.json
